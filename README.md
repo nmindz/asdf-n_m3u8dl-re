@@ -1,8 +1,8 @@
 <div align="center">
 
-# asdf-n_m3u8dl-re [![Build](https://github.com/nmindz/asdf-n_m3u8dl-re/actions/workflows/build.yml/badge.svg)](https://github.com/nmindz/asdf-n_m3u8dl-re/actions/workflows/build.yml) [![Lint](https://github.com/nmindz/asdf-n_m3u8dl-re/actions/workflows/lint.yml/badge.svg)](https://github.com/nmindz/asdf-n_m3u8dl-re/actions/workflows/lint.yml)
+# asdf-N_m3u8DL-RE [![Build](https://github.com/nmindz/asdf-N_m3u8DL-RE/actions/workflows/build.yml/badge.svg)](https://github.com/nmindz/asdf-N_m3u8DL-RE/actions/workflows/build.yml) [![Lint](https://github.com/nmindz/asdf-N_m3u8DL-RE/actions/workflows/lint.yml/badge.svg)](https://github.com/nmindz/asdf-N_m3u8DL-RE/actions/workflows/lint.yml)
 
-[n_m3u8dl-re](https://github.com/nilaoda/N_m3u8DL-RE) plugin for the [asdf version manager](https://asdf-vm.com).
+[N_m3u8DL-RE](https://github.com/nilaoda/N_m3u8DL-RE) plugin for the [asdf version manager](https://asdf-vm.com).
 
 </div>
 
@@ -25,25 +25,25 @@
 Plugin:
 
 ```shell
-asdf plugin add n_m3u8dl-re
+asdf plugin add N_m3u8DL-RE
 # or
-asdf plugin add n_m3u8dl-re https://github.com/nmindz/asdf-n_m3u8dl-re.git
+asdf plugin add N_m3u8DL-RE https://github.com/nmindz/asdf-N_m3u8DL-RE.git
 ```
 
-n_m3u8dl-re:
+N_m3u8DL-RE:
 
 ```shell
 # Show all installable versions
-asdf list-all n_m3u8dl-re
+asdf list-all N_m3u8DL-RE
 
 # Install specific version
-asdf install n_m3u8dl-re latest
+asdf install N_m3u8DL-RE latest
 
 # Set a version globally (on your ~/.tool-versions file)
-asdf global n_m3u8dl-re latest
+asdf global N_m3u8DL-RE latest
 
-# Now n_m3u8dl-re commands are available
-n_m3u8dl-re --help
+# Now N_m3u8DL-RE commands are available
+N_m3u8DL-RE --help
 ```
 
 Check [asdf](https://github.com/asdf-vm/asdf) readme for more instructions on how to
@@ -53,7 +53,7 @@ install & manage versions.
 
 Contributions of any kind welcome! See the [contributing guide](contributing.md).
 
-[Thanks goes to these contributors](https://github.com/nmindz/asdf-n_m3u8dl-re/graphs/contributors)!
+[Thanks goes to these contributors](https://github.com/nmindz/asdf-N_m3u8DL-RE/graphs/contributors)!
 
 # License
 

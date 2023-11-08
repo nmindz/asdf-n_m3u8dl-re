@@ -2,10 +2,32 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for n_m3u8dl-re.
+# TODO: Improve handling unsupported OS releases with friendlier messages.
+case "$OSTYPE" in
+	solaris*) export RELEASE_OS="unsupported" ;;
+	darwin*)  export RELEASE_OS="osx" ;; 
+	linux*)   export RELEASE_OS="linux" ;;
+	bsd*)     export RELEASE_OS="unsupported" ;;
+	msys*)    export RELEASE_OS="unsupported" ;;
+	*)        export RELEASE_OS="unsupported" ;;
+esac
+
+# TODO: Improve handling unsupported Archs with better output/user-friendly messages.
+export OS_ARCH=$(uname -m || "UNSUPPORTED")
+if [ "$OS_ARCH" = "arm64" ] \
+    || [ "$OS_ARCH" = "aarch64_be" ] \
+    || [ "$OS_ARCH" = "aarch64" ] \
+    || [ "$OS_ARCH" = "armv8b" ] \
+    || [ "$OS_ARCH" = "armv8l" ]; then
+    RELEASE_ARCH="arm64"
+else 
+    RELEASE_ARCH="x64"
+fi
+
+# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for N_m3u8DL-RE.
 GH_REPO="https://github.com/nilaoda/N_m3u8DL-RE"
-TOOL_NAME="n_m3u8dl-re"
-TOOL_TEST="n_m3u8dl-re --help"
+TOOL_NAME="N_m3u8DL-RE"
+TOOL_TEST="N_m3u8DL-RE --help"
 
 fail() {
 	echo -e "asdf-$TOOL_NAME: $*"
@@ -13,8 +35,9 @@ fail() {
 }
 
 curl_opts=(-fsSL)
+curl_opts=("${curl_opts[@]}" -H "Accept: application/vnd.github+json")
 
-# NOTE: You might want to remove this if n_m3u8dl-re is not hosted on GitHub releases.
+# NOTE: You might want to remove this if N_m3u8DL-RE is not hosted on GitHub releases.
 if [ -n "${GITHUB_API_TOKEN:-}" ]; then
 	curl_opts=("${curl_opts[@]}" -H "Authorization: token $GITHUB_API_TOKEN")
 fi
@@ -32,19 +55,40 @@ list_github_tags() {
 
 list_all_versions() {
 	# TODO: Adapt this. By default we simply list the tag names from GitHub releases.
-	# Change this function if n_m3u8dl-re has other means of determining installable versions.
+	# Change this function if N_m3u8DL-RE has other means of determining installable versions.
 	list_github_tags
+}
+
+get_release_id() {
+	local tag
+	owner=$(echo "$GH_REPO" | cut -d'/' -f4)
+	repo=$(echo "$GH_REPO" | cut -d'/' -f5)
+	url="https://api.github.com/repos/$owner/$repo/releases"
+	tag=$1
+
+	asset_id=$(curl "${curl_opts[@]}" -X GET $url | jq ".[] | select(.tag_name == \"$tag\") | .id")
+	echo $asset_id
 }
 
 download_release() {
 	local version filename url
 	version="$1"
 	filename="$2"
+	asset_id=$(get_release_id v$version)
 
-	# TODO: Adapt the release URL convention for n_m3u8dl-re
-	url="$GH_REPO/archive/v${version}.tar.gz"
+	if [[ "$RELEASE_OS" =~ ^unsupported ]]; then
+    	echo "This asdf plugin does not support your OS version."
+		exit 1
+	fi
+
+	owner=$(echo "$GH_REPO" | cut -d'/' -f4)
+	repo=$(echo "$GH_REPO" | cut -d'/' -f5)
+	api_url="https://api.github.com/repos/$owner/$repo/releases/$asset_id/assets"
 
 	echo "* Downloading $TOOL_NAME release $version..."
+	assets=$(curl "${curl_opts[@]}" -X GET $api_url)
+	url=$(echo $assets | jq ".[] | select(.name | contains(\"_$RELEASE_OS-\")) | select(.name | contains(\"-$RELEASE_ARCH\")) | .browser_download_url" | tr -d '"')
+	echo "Got URL: ${url}"
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
 }
 
@@ -61,9 +105,10 @@ install_version() {
 		mkdir -p "$install_path"
 		cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
 
-		# TODO: Assert n_m3u8dl-re executable exists.
+		# TODO: Assert N_m3u8DL-RE executable exists.
 		local tool_cmd
 		tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
+		chmod +x $install_path/$tool_cmd
 		test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
 
 		echo "$TOOL_NAME $version installation was successful!"
